@@ -4,11 +4,14 @@ import { QueueServiceClient } from "@azure/storage-queue";
 import { TwitterApi } from "twitter-api-v2";
 
 const timerTrigger: AzureFunction = async function (context: Context, myTimer: any): Promise<void> {
+    console.log("starting");
+
     const queueServiceClient = QueueServiceClient.fromConnectionString(process.env["STORAGE_CONNECTION_STRING"]);
     const paginationQueue = queueServiceClient.getQueueClient(process.env["TWITTER_FOLLOWER_PAGINATION_QUEUE"]);
 
     paginationQueue.createIfNotExists();
 
+    console.log("Getting pagination token");
     let paginationTokenResponse = await paginationQueue.receiveMessages({
         numberOfMessages: 1
     });
@@ -17,11 +20,17 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
         ? paginationTokenResponse.receivedMessageItems[0].messageText
         : undefined;
 
+    console.log("Pagination token: " + paginationToken);
+
+    console.log("Connecting to twitter API");
     let client = new TwitterApi(process.env["FOLLOWER_BEARER_TOKEN"]);
 
+    console.log("Retrieving account information");
     let account = await client.v2.userByUsername(process.env["FOLLOWER_ACCOUNT"]);
     let accountId = account.data.id;
+    console.log("Got account id: " + accountId);
 
+    console.log("Getting followers");
     let followers = await client.v2.followers(accountId, {
         max_results: 1000,
         pagination_token: paginationToken
@@ -29,10 +38,12 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
 
     if (followers.errors && followers.errors.length > 0)
     {
-        console.log(followers.errors);
+        console.log("errors: " + followers.errors);
         return;
     }
+    console.log(followers.data.length + " followers retrieved");
 
+    console.log("Connection to table storage");
     const tableName = `followers`;
     const tableClient = TableClient.fromConnectionString(process.env["STORAGE_CONNECTION_STRING"], tableName);
 
@@ -49,6 +60,8 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
         }
     }
 
+    console.log("Loaded " + existingFollowers.length + " current followers");
+
     let transaction = new TableTransaction();
 
     const newUserQueue = queueServiceClient.getQueueClient(process.env["TWITTER_NEW_FOLLOWER_QUEUE"]);
@@ -63,6 +76,7 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
             continue;
         }
 
+        console.log("Adding " + follower.id + " as new follower");
         transaction.createEntity({
             partitionKey: partitionKey,
             rowKey: follower.id
@@ -84,8 +98,11 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
 
     if (followers.meta.next_token)
     {
+        console.log("Adding pagination to queue: " + followers.meta.next_token);
         await paginationQueue.sendMessage(followers.meta.next_token);
     }
+
+    console.log("done");
 };
 
 export default timerTrigger;
