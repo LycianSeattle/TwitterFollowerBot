@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "name": "myQueueItem",
+      "type": "queueTrigger",
+      "direction": "in",
+      "queueName": "twitter-follower-pagination",
+      "connection": "QUEUE_STORAGE_STRING"
+    }
+  ],
+  "scriptFile": "../dist/UpdateFollowerFromPagination/index.js"
+}
