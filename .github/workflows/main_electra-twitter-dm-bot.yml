@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.ELECTRA_AZURE_CREDENTIALS }}
 
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v2
