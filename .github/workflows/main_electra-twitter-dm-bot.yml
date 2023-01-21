@@ -7,7 +7,7 @@ name: Build and deploy Node.js project to Azure Function App - electra-twitter-d
 on:
   push:
     branches:
-      - main
+      - electra
   workflow_dispatch:
 
 env:
