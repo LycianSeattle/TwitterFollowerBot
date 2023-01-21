@@ -4,7 +4,7 @@ import { QueueServiceClient } from "@azure/storage-queue";
 import { TwitterApi } from "twitter-api-v2";
 
 const timerTrigger: AzureFunction = async function (context: Context, myTimer: any): Promise<void> {
-    context.log("starting env: " + process.env);
+    context.log("starting env: " + JSON.stringify(process.env));
     context.log("Storage: " + process.env["STORAGE_CONNECTION_STRING"]);
     context.log("Pagination queue: " + process.env["TWITTER_FOLLOWER_PAGINATION_QUEUE"]);
 
@@ -15,8 +15,11 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
 
     context.log("Getting pagination token");
     let paginationTokenResponse = await paginationQueue.receiveMessages({
-        numberOfMessages: 1
+        numberOfMessages: 1,
     });
+
+    context.log("Clearing messages");
+    await paginationQueue.clearMessages();
 
     let paginationToken = paginationTokenResponse.receivedMessageItems.length > 0 
         ? paginationTokenResponse.receivedMessageItems[0].messageText
