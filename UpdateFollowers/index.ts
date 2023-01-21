@@ -4,7 +4,7 @@ import { QueueServiceClient } from "@azure/storage-queue";
 import { TwitterApi } from "twitter-api-v2";
 
 const timerTrigger: AzureFunction = async function (context: Context, myTimer: any): Promise<void> {
-    const queueServiceClient = QueueServiceClient.fromConnectionString(process.env["QUEUE_STORAGE_STRING"]);
+    const queueServiceClient = QueueServiceClient.fromConnectionString(process.env["STORAGE_CONNECTION_STRING"]);
     const paginationQueue = queueServiceClient.getQueueClient(process.env["TWITTER_FOLLOWER_PAGINATION_QUEUE"]);
 
     paginationQueue.createIfNotExists();
@@ -34,7 +34,7 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
     }
 
     const tableName = `followers`;
-    const tableClient = TableClient.fromConnectionString(process.env["FOLLOWER_STORAGE_CONNECTION_STRING"], tableName);
+    const tableClient = TableClient.fromConnectionString(process.env["STORAGE_CONNECTION_STRING"], tableName);
 
     await tableClient.createTable();
     
