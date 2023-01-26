@@ -9,14 +9,15 @@ const queueTrigger: AzureFunction = async function (context: Context, myQueueIte
         accessSecret: process.env["ACCESS_SECRET"]
     });
 
-    let result = await client.v1.sendDm({
-        recipient_id: myQueueItem,
-        text: `Thank you for following @ElectraSantiago
+    const message = `Thank you for following @ElectraSantiago
  
-        I am Her personal slave, and She has asked that I communicate that She has a very special task for you. She is eager to speak with you and has requested that you send a DM here: http://www.onlyfans.com/electrasantiagovip`
+    I am Her personal slave, and She has asked that I communicate that She has a very special task for you. She is eager to speak with you and has requested that you send a DM here: http://www.onlyfans.com/electrasantiagovip`;
+
+    const result = await client.v2.sendDmToParticipant(myQueueItem, {
+        text: message
     });
 
-    context.log(result.event.id + " => " + myQueueItem);
+    context.log(result.dm_event_id + " => " + myQueueItem);
 };
 
 export default queueTrigger;
