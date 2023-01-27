@@ -101,7 +101,14 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
             transaction = new TableTransaction();
         }
 
-        await SendMessage(context, follower.id, client);
+        try 
+        {
+            await SendMessage(context, follower.id, client);
+        }
+        catch (e)
+        {
+            context.log(e.message);
+        }
     }
 
     if (transaction.actions.length > 0)
