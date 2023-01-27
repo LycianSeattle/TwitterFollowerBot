@@ -12,6 +12,11 @@
   "dependencies": {
     "@azure/data-tables": "^13.2.1",
     "@azure/storage-queue": "^12.11.0",
+    "node-fetch": "^3.3.0",
+    "oauth": "^0.10.0",
+    "request": "^2.88.2",
+    "twit": "^2.2.11",
+    "twitter-api-sdk": "^1.2.1",
     "twitter-api-v2": "^1.14.0"
   },
   "devDependencies": {

@@ -28,7 +28,7 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
     context.log("Pagination token: " + paginationToken);
 
     context.log("Connecting to twitter API");
-    let client = new TwitterApi(process.env["FOLLOWER_BEARER_TOKEN"]);
+    let client = new TwitterApi(process.env["BEARER_TOKEN"]);
 
     context.log("Retrieving account information");
     let account = await client.v2.userByUsername(process.env["FOLLOWER_ACCOUNT"]);
@@ -93,7 +93,7 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
             transaction = new TableTransaction();
         }
 
-        newUserQueue.sendMessage(follower.id);
+        await SendMessage(context, follower.id);
     }
 
     if (transaction.actions.length > 0)
@@ -109,5 +109,28 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
 
     context.log("done");
 };
+
+async function SendMessage(context: Context, userId: string) : Promise<void>
+{
+    const client = new TwitterApi({
+        appKey: process.env["API_KEY"],
+        appSecret: process.env["API_KEY_SECRET"],
+        accessToken: process.env["ACCESS_TOKEN"],
+        accessSecret: process.env["ACCESS_SECRET"]
+    });
+
+    context.log("Sending message to " + userId);
+    
+    const message = `Thank you for following @ElectraSantiago
+ 
+    I am Her personal slave, and She has asked that I communicate that She has a very special task for you. She is eager to speak with you and has requested that you send a DM here: http://www.onlyfans.com/electrasantiagovip`;
+
+    const result = await client.v1.sendDm({
+        recipient_id: userId,
+        text: message
+    });
+
+    context.log(result.event.id + " => " + userId);
+}
 
 export default timerTrigger;
