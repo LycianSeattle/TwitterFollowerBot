@@ -4,7 +4,6 @@ import { QueueServiceClient } from "@azure/storage-queue";
 import { TwitterApi } from "twitter-api-v2";
 
 const timerTrigger: AzureFunction = async function (context: Context, myTimer: any): Promise<void> {
-    context.log("starting env: " + JSON.stringify(process.env));
     context.log("Storage: " + process.env["STORAGE_CONNECTION_STRING"]);
     context.log("Pagination queue: " + process.env["TWITTER_FOLLOWER_PAGINATION_QUEUE"]);
 
@@ -28,7 +27,16 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
     context.log("Pagination token: " + paginationToken);
 
     context.log("Connecting to twitter API");
-    let client = new TwitterApi(process.env["BEARER_TOKEN"]);
+
+    const credentials = {
+        appKey: process.env["API_KEY"],
+        appSecret: process.env["API_KEY_SECRET"],
+        accessToken: process.env["ACCESS_TOKEN"],
+        accessSecret: process.env["ACCESS_SECRET"]
+    };
+
+    context.log("Credentials: " + JSON.stringify(credentials));
+    const client = new TwitterApi(credentials);
 
     context.log("Retrieving account information");
     let account = await client.v2.userByUsername(process.env["FOLLOWER_ACCOUNT"]);
@@ -93,7 +101,7 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
             transaction = new TableTransaction();
         }
 
-        await SendMessage(context, follower.id);
+        await SendMessage(context, follower.id, client);
     }
 
     if (transaction.actions.length > 0)
@@ -110,15 +118,8 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
     context.log("done");
 };
 
-async function SendMessage(context: Context, userId: string) : Promise<void>
+async function SendMessage(context: Context, userId: string, client: TwitterApi) : Promise<void>
 {
-    const client = new TwitterApi({
-        appKey: process.env["API_KEY"],
-        appSecret: process.env["API_KEY_SECRET"],
-        accessToken: process.env["ACCESS_TOKEN"],
-        accessSecret: process.env["ACCESS_SECRET"]
-    });
-
     context.log("Sending message to " + userId);
     
     const message = `Thank you for following @ElectraSantiago
