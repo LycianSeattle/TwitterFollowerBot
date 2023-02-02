@@ -129,9 +129,11 @@ async function SendMessage(context: Context, userId: string, client: TwitterApi)
 {
     context.log("Sending message to " + userId);
     
-    const message = `Thank you for following @ElectraSantiago
- 
-    I am Her personal slave, and She has asked that I communicate that She has a very special task for you. She is eager to speak with you and has requested that you send a DM here: http://www.onlyfans.com/electrasantiagovip`;
+    const message = `Thank you for following @electrasantiago
+
+She's running a huge sale on Her OnlyFans right now, get it for only $6!
+
+The first 50 people that sign up during this promotion will also get a free full pegging video! Just DM Her the code "ThankYouMiss" when you sign up, and don't forget to respond to her first message 😉`;
 
     const result = await client.v1.sendDm({
         recipient_id: userId,
