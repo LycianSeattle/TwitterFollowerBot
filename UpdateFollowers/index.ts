@@ -131,13 +131,9 @@ async function SendMessage(context: Context, userId: string, client: TwitterApi)
     
     const message = `Thank you for following @electrasantiago
 
-She's giving away 100 free trials to her OnlyFans this month in celebration of her OnlyFansiversary 💗
+She's running a huge sale on Her OnlyFans right now, get it for only $6!
 
-Think it's too good to be true? Go ahead and ask her!
-
-Here's the link: https://onlyfans.com/action/trial/cy6brpgkwimubotuqysme7g2djbt5rh1
-
-Make sure to follow the instructions in her first DM to you, and congratulations!`;
+The first 50 people that sign up during this promotion will also get a free full pegging video! Just DM Her the code "ThankYouMiss" when you sign up, and don't forget to respond to her first message 😉`;
 
     const result = await client.v1.sendDm({
         recipient_id: userId,
